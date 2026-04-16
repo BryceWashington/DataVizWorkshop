@@ -77,7 +77,46 @@ Inputs.table(gdp2010)
 ```
 
 ```js
-const dotColor = view(Inputs.radio(["red", "gree", "blue"], {label: "Pick a dot color", value: "blue"}));
+const dotColor = view(Inputs.radio(["red", "green", "blue"], {label: "Pick a dot color", value: "blue"}));
+```
+
+```js
+const [life, gdp] = await Promise.all([life2010, gdp2010]);
+
+const joinedData = life.map(l => {
+  const matchingGdp = gdp.find(g => g.Entity === l.Entity);
+  return {
+    country: l.Entity,
+    lifeExpectancy: +l["Life expectancy"], // Ensure these are numbers
+    gdp: matchingGdp ? +matchingGdp["GDP per capita"] : null
+  };
+}).filter(d => d.gdp !== null && d.lifeExpectancy !== null);
+
+const chart = Plot.plot({
+  grid: true,
+  x: {
+    type: "log", 
+    label: "GDP per capita →",
+    domain: d3.extent(joinedData, d => d.gdp)
+  },
+  y: {
+    type: "linear", 
+    label: "↑ Life Expectancy",
+    domain: d3.extent(joinedData, d => d.lifeExpectancy),
+    inset: 10
+  },
+  marks: [
+    Plot.dot(joinedData, {
+      x: "gdp", 
+      y: "lifeExpectancy", 
+      stroke: dotColor, // This reacts to the radio button
+      tip: true // Adds a hover tooltip
+    })
+  ]
+});
+
+display(chart);
+
 ```
 
 
