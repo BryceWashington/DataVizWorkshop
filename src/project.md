@@ -65,6 +65,7 @@ const life2010 = FileAttachment("data/life-2010.csv").csv();
 ```
 
 ```js
+\\ test
 Inputs.table(life2010)
 ```
 
